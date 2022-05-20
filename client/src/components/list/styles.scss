@@ -1,0 +1,14 @@
+ul {
+  li div.box.item {
+    padding: 1rem 1rem 1.5rem;
+    cursor: pointer;
+
+    .date {
+      display: flex;
+      font-size: 12px;
+      flex-direction: column;
+      align-items: flex-end;
+      color: black;
+    }
+  }
+}

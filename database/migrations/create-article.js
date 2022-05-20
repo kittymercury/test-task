@@ -3,8 +3,8 @@ export const up = (knex, Promise) => {
     table.increments('id').primary()
     table.string('heading').defaultTo('Untitled article')
     table.string('content', 10000)
-    table.timestamp('created_at').defaultTo(null)
-    table.timestamp('updated_at').defaultTo(null)
+    table.timestamp('created_at', {useTz: false}).defaultTo(null)
+    table.timestamp('updated_at', {useTz: false}).defaultTo(null)
   })
 }
 

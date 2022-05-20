@@ -1,0 +1,89 @@
+nav.navbar {
+  background-color: #2f2f2f;
+  display: flex;
+  align-content: center;
+  align-items: center;
+  justify-content: space-between;
+  height: 4.25rem;
+
+  .navbar-dropdown {
+    display: none;
+    position: fixed;
+    z-index: 40;
+    top: 4.25rem;
+    background: #717171;
+    right: 0;
+
+    &.is-active {
+      display: block;
+    }
+
+    div {
+      font-size: 16px;
+      font-weight: bolder;
+      padding: 0.5rem 2rem;
+      cursor: pointer;
+      text-align: center;
+      
+      &:first-child {
+        border-bottom: 1px solid #2f2f2f;
+      }
+    }
+  }
+
+  .back {
+    align-items: center;
+    display: flex;
+    background: none;
+    border: none;
+    font-size: 20px;
+    font-weight: bold;
+    color: white;
+  }
+
+  .heading {
+    margin: 0;
+    font-size: 20px;
+    text-transform: none;
+    height: 100%;
+    display: flex;
+    padding-left: 20px;
+    color: white;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+  }
+
+  .button.add {
+    font-size: 20px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+  }
+
+  button.button {
+    background: none;
+    border: none;
+    color: white;
+
+    &:hover {
+      border: none;
+    }
+  }
+
+  .navbar-item {
+    color: white;
+    background: none;
+    font-size: 18px;
+    font-weight: bold;
+  }
+
+  .navbar-link:not(.is-arrowless)::after {
+    border-color: white;
+  }
+
+  .navbar-link:hover, a, .navbar-link {
+    color: white;
+    background: none;
+  }
+}
