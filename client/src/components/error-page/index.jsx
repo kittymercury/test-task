@@ -8,7 +8,7 @@ export default class ErrorPage extends React.Component {
         <div className="box">
           <div className="title is-2">Error! 🥺</div>
           <div className="title is-4">
-            This page doesn't exist. Go to <Link to="/">main page</Link>
+            This page doesn't exist. Go to <Link to="/articles">main page</Link>
           </div>
         </div>
       </div>

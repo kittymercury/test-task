@@ -33,6 +33,23 @@ services:
     env_file:
       - server/.env
 
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    image: test-task/client
+    container_name: client
+    depends_on:
+      - server
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./client:/src/test-task/client
+      - client_node_modules:/src/test-task/client/node_modules
+    command: yarn start
+    env_file:
+      - client/.env
+
   postgres:
     image: postgres:latest
     container_name: postgres
@@ -50,6 +67,8 @@ volumes:
     name: test-task-database-nm
   server_node_modules:
     name: test-task-server-nm
+  client_node_modules:
+    name: test-task-client-nm
   postgres_data:
     name: test-task-postgres-data
 

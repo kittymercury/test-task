@@ -12,15 +12,15 @@ const root = ReactDOM.createRoot(document.getElementById('root'))
 root.render(
   <React.StrictMode>
     <BrowserRouter>
-    <Routes>
-      <Route path="/" element={<App />}>
-        <Route path="articles" element={<List />} />
-        <Route path="article">
-          <Route path=":id" element={<ArticlePage />} />
+      <Routes>
+        <Route path="/" element={<App />}>
+          <Route path="articles" element={<List />} />
+          <Route path="article">
+            <Route path=":id" element={<ArticlePage />} />
+          </Route>
+          <Route path="*" element={<ErrorPage />} />
         </Route>
-        <Route path="*" element={<ErrorPage />} />
-      </Route>
-    </Routes>
-  </BrowserRouter>
+      </Routes>
+    </BrowserRouter>
   </React.StrictMode>
 )

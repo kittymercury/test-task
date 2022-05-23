@@ -1,5 +1,9 @@
 import React from 'react'
 import TextareaAutosize from 'react-textarea-autosize'
+import { Link } from 'react-router-dom'
+import moment from 'moment'
+
+import api from '../../api'
 
 import './styles.scss'
 
@@ -8,25 +12,107 @@ export default class ArticlePage extends React.Component {
     super(props)
 
     this.state = {
+      article: {},
       heading: '',
       content: '',
-      isEditMode: false
+      isEditMode: false,
+      popupVisible: false
     }
   }
 
   componentDidMount = () => {
-    console.log(window.location.pathname)
+    this.getArticle()
+    this.getMode()
+  }
+
+  getArticle = async () => {
+    const id = +window.location.pathname.split('/')[2].split('?')[0]
+    const { data = {} } = await api.get(`/article/${id}`)
+
+    this.setState({ article: data })
+  }
+
+  getMode = () => {
+    const search = window.location.search
+
+    if (search === '?edit=true') {
+      this.setState({ isEditMode: true })
+    }
   }
 
   handleChange = (name, e) => {
     this.setState({ [name]: e.target.value })
   }
 
-  renderHeading = (article) => {
-    if (this.props.isEditMode) {
-      return (
+  handleClickClosePopup = () => {
+    this.setState({ popupVisible: false })
+  }
+
+  handleClickDelete = () => {
+    this.setState({ popupVisible: true })
+  }
+
+  handleClickEdit = () => {
+    this.setState({ isEditMode: true })
+  }
+
+  handleConfirmDelete = async (id) => {
+    const response = api.delete(`/article/${id}`)
+
+    if (response.deleted) {
+      this.setState({ popupVisible: false })
+    }
+  }
+
+  handleClickRejectChanges = () => {
+    this.setState({ isEditMode: false })
+  }
+
+  handleClickApplyChanges = async (article) => {
+    const payload = {
+      heading: this.state.heading,
+      content: this.state.content
+    }
+
+    if (article.created_at) {
+      payload.updated_at = new Date()
+    } else {
+      payload.created_at = new Date()
+    }
+
+    const response = await api.put(`/article/${article.id}`, payload)
+    console.log({response})
+
+    this.setState({ isEditMode: false, article: response.data.updatedArticle })
+  }
+
+  renderArticleReadMode = (article) => {
+    const createdAt = new Date(article.created_at)
+    const updatedAt = new Date(article.updated_at)
+    const convertedCreatedAt = moment(createdAt).format('LLL')
+    const convertedUpdatedAt = moment(updatedAt).format('LLL')
+
+    return (
+      <div className="container read-mode">
+        <div className="section">
+          <div className="title is-4">{article.heading}</div>
+        </div>
         <div className="box">
-          <label htmlFor="heading">Heading</label>
+          {article.content}
+        </div>
+        <div className="footer">
+          <div>Created: {convertedCreatedAt}</div>
+          <div>{article.updated_at ? 'Edited: ' + convertedUpdatedAt : ''}</div>
+        </div>
+      </div>
+    )
+  }
+
+  renderArticleEditMode = (article) => {
+    return (
+      <div className="container edit-mode">
+        <div className="box">
+          <label htmlFor="heading">Article heading</label>
           <TextareaAutosize
             defaultValue={article.heading}
             autoFocus
@@ -35,21 +121,8 @@ export default class ArticlePage extends React.Component {
             onChange={(e) => this.handleChange('heading', e)}
           />
         </div>
-      )
-    } else {
-      return (
-        <div className="section">
-          <div className="title">{article.heading}</div>
-        </div>
-      )
-    }
-  }
-
-  renderContent = (article) => {
-    if (this.props.isEditMode) {
-      return (
         <div className="box">
-          <label htmlFor="content">Content</label>
+          <label htmlFor="content">Article content</label>
           <TextareaAutosize
             defaultValue={article.content}
             id="content"
@@ -57,39 +130,75 @@ export default class ArticlePage extends React.Component {
             onChange={(e) => this.handleChange('content', e)}
           />
         </div>
-      )
-    } else {
-      return (
-        <div className="box">
-          {article.content}
-        </div>
-      )
-    }
+      </div>
+    )
   }
 
-  renderFooter = (article) => {
-    if (!this.props.editMode) {
+  renderButtons = (article) => {
+    if (window.location.search) {
       return (
-        <div className="footer">
-          <div>Created {article.created_at}</div>
-          <div>{article.updated_at ? 'Edited' + article.updated_at : ''}</div>
+        <div className="navbar">
+          <div className="navbar-item cancel" onClick={this.handleClickRejectChanges}>
+            <Link to={`/article/${article.id}`}>
+              Cancel
+            </Link>
+          </div>
+          <div className="navbar-item save" onClick={() => this.handleClickApplyChanges(article)}>
+            <Link to={`/article/${article.id}`}>
+              Save
+            </Link>
+          </div>
         </div>
       )
     } else {
-      return ''
+      return (
+        <div className="navbar">
+          <div className="navbar-item back">
+            <Link to="/articles">Back</Link>
+          </div>
+          <div className="navbar-item edit-delete">
+            <div className="edit" onClick={this.handleClickEdit}>
+              <Link to={`/article/${article.id}?edit=true`}>
+                Edit
+              </Link>
+            </div>
+            <div className="del" onClick={this.handleClickDelete}>
+              Delete
+            </div>
+          </div>
+        </div>
+      )
     }
+  } 
+
+  renderPopup = (article) => {
+    return (
+      <div className="popup">
+        <div className="box">
+          <div className="title is-4">
+            If you delete this article it will be impossible to restore it. Are you sure? 
+          </div>
+          <div className="buttons">
+            <div className="button is-primary" onClick={() => this.handleConfirmDelete(article.id)}>
+              <Link to="/articles">Yes</Link>
+            </div>
+            <div className="button is-danger" onClick={this.handleClickClosePopup}>Cancel</div>
+          </div>
+        </div>
+      </div>
+    )
   }
 
 
   render() {
-    const { articles, id } = this.props
-    const article = articles.find((a) => a.id === id)
+    const { article, popupVisible, isEditMode } = this.state
+    console.log(article)
     
     return (
-      <div className="container">
-        {this.renderHeading(article)}
-        {this.renderContent(article)}
-        {this.renderFooter(article)}
+      <div>
+        {this.renderButtons(article)}
+        {popupVisible && this.renderPopup(article)}
+        {isEditMode ? this.renderArticleEditMode(article) : this.renderArticleReadMode(article)}
       </div>
     )
   }
