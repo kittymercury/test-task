@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 
 import './styles.scss'
 import api  from '../../api'
+
 export default class List extends React.Component {
   constructor(props) {
     super(props);
@@ -27,7 +28,7 @@ export default class List extends React.Component {
     const response = await api.post('/article')
 
     if (response.data.article) {
-      window.location.assign(`http://localhost:3000/article/${response.data.article.id}?edit=true`);
+      window.location.assign(`http://${process.env.REACT_APP_HOSTNAME}:3000/article/${response.data.article.id}?edit=true`);
     }
 
     console.log(response.data.article)

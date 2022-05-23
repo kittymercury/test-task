@@ -98,7 +98,7 @@ export default class ArticlePage extends React.Component {
           <div className="title is-4">{article.heading}</div>
         </div>
         <div className="box">
-          {article.content}
+          {article.content ? article.content : 'No content'}
         </div>
         <div className="footer">
           <div>Created: {convertedCreatedAt}</div>
