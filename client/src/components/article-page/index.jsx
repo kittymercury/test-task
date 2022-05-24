@@ -66,9 +66,11 @@ export default class ArticlePage extends React.Component {
 
   handleClickRejectChanges = async (article) => {
     if (!article.created_at) {
-      return this.handleClickDelete()
+      this.setState({ popupVisible: true })
+
+      return
     }
-    
+
     this.setState({ isEditMode: false })
   }
 
@@ -143,9 +145,12 @@ export default class ArticlePage extends React.Component {
       return (
         <div className="navbar">
           <div className="navbar-item cancel" onClick={() => this.handleClickRejectChanges(article)}>
-            <Link to={`/article/${article.id}`}>
-              Cancel
-            </Link>
+            {article.created_at && (
+              <Link to={`/article/${article.id}`}>
+                Cancel
+              </Link>
+            )}
+            {!article.created_at && <a>Cancel</a>}
           </div>
           <div className="navbar-item save" onClick={() => this.handleClickApplyChanges(article)}>
             <Link to={`/article/${article.id}`}>
