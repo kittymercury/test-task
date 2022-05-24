@@ -57,14 +57,18 @@ export default class ArticlePage extends React.Component {
   }
 
   handleConfirmDelete = async (id) => {
-    const response = api.delete(`/article/${id}`)
+    const response = await api.delete(`/article/${id}`)
 
     if (response.deleted) {
       this.setState({ popupVisible: false })
     }
   }
 
-  handleClickRejectChanges = () => {
+  handleClickRejectChanges = async (article) => {
+    if (!article.created_at) {
+      return this.handleClickDelete()
+    }
+    
     this.setState({ isEditMode: false })
   }
 
@@ -138,7 +142,7 @@ export default class ArticlePage extends React.Component {
     if (window.location.search) {
       return (
         <div className="navbar">
-          <div className="navbar-item cancel" onClick={this.handleClickRejectChanges}>
+          <div className="navbar-item cancel" onClick={() => this.handleClickRejectChanges(article)}>
             <Link to={`/article/${article.id}`}>
               Cancel
             </Link>
