@@ -8,13 +8,13 @@ export default async function(req, res) {
       ...article,
       heading: req.body.heading ? req.body.heading : article.heading,
       content: req.body.content ? req.body.content : article.content,
-      updated_at: req.body.updated_at ? req.body.updated_at : null,
-      created_at: req.body.created_at ? req.body.created_at : null
+      created_at: req.body.created_at ? req.body.created_at : article.created_at,
+      updated_at: article.created_at ? req.body.updated_at : null
     }
 
-    const [ updatedArticle ] = await db('articles').where({ id: +req.params.id }).update(attributes).returning(['id', 'heading', 'content', 'created_at', 'updated_at'])
+    const [ updatedArticle ] = await db('articles').where({ id: +req.params.id }).update(attributes).returning('*')
     
-    res.json({ updatedArticle })
+    res.json(updatedArticle)
   } catch (error) {
     res.json({ error })
   }

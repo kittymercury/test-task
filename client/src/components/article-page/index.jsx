@@ -83,7 +83,7 @@ export default class ArticlePage extends React.Component {
     const response = await api.put(`/article/${article.id}`, payload)
     console.log({response})
 
-    this.setState({ isEditMode: false, article: response.data.updatedArticle })
+    this.setState({ isEditMode: false, article: response.data })
   }
 
   renderArticleReadMode = (article) => {

@@ -27,11 +27,11 @@ export default class List extends React.Component {
   handleClickCreateNewArticle = async () => {
     const response = await api.post('/article')
 
-    if (response.data.article) {
-      window.location.assign(`http://${process.env.REACT_APP_HOSTNAME}:3000/article/${response.data.article.id}?edit=true`);
+    if (response.data) {
+      window.location.assign(`http://${process.env.REACT_APP_HOSTNAME}:3000/article/${response.data.id}?edit=true`);
     }
 
-    console.log(response.data.article)
+    console.log(response.data)
   }
   
   renderList = () => {
