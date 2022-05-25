@@ -1,10 +1,6 @@
 const axios = require('axios')
 const lodash = require('lodash')
 
-test('Basic test', async () => {
-  expect(true).toEqual(true)
-})
-
 describe('REST API', () => {
   describe('GET /articles', () => {
     it('Should return all articles', async () => {
@@ -21,50 +17,64 @@ describe('REST API', () => {
       
       expect(result.status).toEqual(200)
       expect(result.data).toHaveProperty('id')
-      expect(result.data).toHaveProperty('created_at')
       expect(result.data.heading).toEqual('Untitled article')
       expect(result.data.content).toBeNull()
+      expect(result.data.created_at).toBeNull()
       expect(result.data.updated_at).toBeNull()
     })
   })
 
   describe('GET /article', () => {
     it('Should get one article', async () => {
-      const newArticle = await axios.post('http://server:2000/article')
-      const result = await axios.get(`http://server:2000/article/${newArticle.data.id}`)
+      const article = await axios.post('http://server:2000/article')
+      const result = await axios.get(`http://server:2000/article/${article.data.id}`)
       
       expect(result.status).toEqual(200)
-      expect(result.data.id).toEqual(newArticle.data.id)
-      expect(result.data.heading).toEqual(newArticle.data.heading)
-      expect(result.data.content).toEqual(newArticle.data.content)
-      expect(result.data.created_at).toEqual(newArticle.data.created_at)
-      expect(result.data.updated_at).toEqual(newArticle.data.updated_at)
+      expect(result.data.id).toEqual(article.data.id)
+      expect(result.data.heading).toEqual(article.data.heading)
+      expect(result.data.content).toEqual(article.data.content)
+      expect(result.data.created_at).toEqual(article.data.created_at)
+      expect(result.data.updated_at).toEqual(article.data.updated_at)
     })
   })
 
   describe('PUT /article', () => {
-    it('Should update one article', async () => {
-      const newArticle = await axios.post('http://server:2000/article')
+    it('Should return error if no heading provided', async () => {
+      const article = await axios.post('http://server:2000/article')
+      const result = await axios.put(`http://server:2000/article/${article.data.id}`)
 
-      const payload = {
-        content: 'test',
-        created_at: newArticle.data.created_at ? newArticle.data.created_at : new Date(),
-        updated_at: newArticle.data.created_at ? new Date() : null
-      }
-      
-      const result = await axios.put(`http://server:2000/article/${newArticle.data.id}`, payload)
-      console.log(result)
+      expect(result.data.error).toEqual('Heading must be provided')
+    })
 
-      if (!newArticle.data.created_at) {
-        expect(result.data.created_at).not.toBeNull()
-      }
+    it('Should change heading', async () => {
+      const article = await axios.post('http://server:2000/article')
+      const result = await axios.put(`http://server:2000/article/${article.data.id}`, { heading: 'Heading' })
 
-      if (newArticle.data.created_at) {
-        expect(result.data.updated_at).not.toBeNull()
-      }
-      
-      expect(result.status).toEqual(200)
-      expect(result.data.content).toEqual(payload.content)
+      expect(result.data.heading).toEqual('Heading')
+      expect(result.data.content).toBeNull()
+      expect(result.data.created_at).not.toBeNull()
+      expect(result.data.updated_at).toBeNull()
+    })
+
+    it('Should change content', async () => {
+      const article = await axios.post('http://server:2000/article')
+      const result = await axios.put(`http://server:2000/article/${article.data.id}`, { content: 'Content', heading: 'Heading' })
+
+      expect(result.data.heading).toEqual('Heading')
+      expect(result.data.content).toEqual('Content')
+      expect(result.data.created_at).not.toBeNull()
+      expect(result.data.updated_at).toBeNull()
+    })
+
+    it('Should change updated_at date', async () => {
+      const article = await axios.post('http://server:2000/article')
+      const updatedArticle = await axios.put(`http://server:2000/article/${article.data.id}`, { content: 'Content', heading: 'Heading' })
+      const result = await axios.put(`http://server:2000/article/${updatedArticle.data.id}`, { content: 'New content', heading: 'New heading' })
+
+      expect(result.data.heading).toEqual('New heading')
+      expect(result.data.content).toEqual('New content')
+      expect(result.data.created_at).not.toBeNull()
+      expect(result.data.updated_at).not.toBeNull()
     })
   })
 

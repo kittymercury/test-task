@@ -29,7 +29,7 @@ export default class ArticlePage extends React.Component {
     const id = +window.location.pathname.split('/')[2].split('?')[0]
     const { data = {} } = await api.get(`/article/${id}`)
 
-    this.setState({ article: data })
+    this.setState({ article: data, heading: data.heading, content: data.content })
   }
 
   getMode = () => {
@@ -80,11 +80,7 @@ export default class ArticlePage extends React.Component {
       content: this.state.content
     }
 
-    if (article.created_at) {
-      payload.updated_at = new Date()
-    } else {
-      payload.created_at = new Date()
-    }
+    if (!payload.heading.trim()) return
 
     const response = await api.put(`/article/${article.id}`, payload)
     console.log({response})
@@ -150,12 +146,15 @@ export default class ArticlePage extends React.Component {
                 Cancel
               </Link>
             )}
-            {!article.created_at && <a>Cancel</a>}
+            {!article.created_at && <div>Cancel</div>}
           </div>
           <div className="navbar-item save" onClick={() => this.handleClickApplyChanges(article)}>
-            <Link to={`/article/${article.id}`}>
-              Save
-            </Link>
+            {this.state.heading.trim() && (
+              <Link to={`/article/${article.id}`}>
+                Save
+              </Link>
+            )}
+            {!this.state.heading.trim() && <div>Save</div>}
           </div>
         </div>
       )
@@ -184,7 +183,7 @@ export default class ArticlePage extends React.Component {
     return (
       <div className="popup">
         <div className="box">
-          <div className="title is-4">
+          <div className="title is-5">
             If you delete this article it will be impossible to restore it. Are you sure? 
           </div>
           <div className="buttons">
